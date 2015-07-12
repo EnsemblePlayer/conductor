@@ -1,0 +1,20 @@
+{
+    "name": "EnsemblePlayer/conductor",
+    "version": "1.0.0",
+    "description": "Ensemble API",
+    "keywords": ["ensemble","rest","api"],
+    "homepage": "http://github.com/EnsemblePlayer/conductor",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Thomas Gaubert"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "monolog/monolog": "1.*",
+        "slim/slim": "2.*",
+        "slim/views": "0.*",
+        "twig/twig": "1.*"
+    }
+}
