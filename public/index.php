@@ -4,7 +4,7 @@ require_once '../app/middleware/APIResponseMiddleware.php';
 
 $config = require_once '../app/config.php';
 $app = new \Slim\Slim($config['slim']);
-$app->add(new \middleware\APIResponseMiddleware());
+$app->add(new \middleware\APIResponseMiddleware($config));
 
 $app->get('/', function() use($app, $config) {
     $app->response->setStatus(200);
