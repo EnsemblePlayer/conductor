@@ -16,4 +16,9 @@ $app->get('/error', function() use($app) {
     echo json_encode(array("code" => 404, "message" => "Example 404 error.", "description" => "Just a test error."));
 });
 
+$app->notFound(function () use ($app) {
+    $app->response->setStatus(404);
+    echo json_encode(array("code" => 404, "message" => "404 Not Found", "description" => "Unable to locate requested resource."));
+});
+
 $app->run();
