@@ -11,9 +11,9 @@ $app->get('/', function() use($app, $config) {
     echo json_encode(array("name" => "conductor", "version" => $config['conductor']['version'], "timestamp" => date_timestamp_get(date_create())));
 }); 
 
-$app->get('/error', function() use($app) {
-    $app->response->setStatus(404);
-    echo json_encode(array("code" => 404, "message" => "Example 404 error.", "description" => "Just a test error."));
+$app->post('/logout', function() use($app) {
+	// TODO: Revoke session key
+    $app->response->setStatus(200);
 });
 
 $app->notFound(function () use ($app) {
