@@ -35,7 +35,7 @@ $app->get('/users/:id', function($id) use($app, $config, $m) {
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `userData` WHERE `userId`='$id' ORDER BY `userId`") or die($m->error);
 	if($s->num_rows=1){
-		$arr = $s->fetch_array(MYSQLI_ASSOC));
+		$arr = $s->fetch_array(MYSQLI_ASSOC);
 		$u = array();
 		$u['userId'] = $arr['userId'];
 		$u['username']= $arr['username'];
@@ -48,7 +48,7 @@ $app->get('/users/:username', function($id) use($app, $config, $m) {
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `userData` WHERE `username`='$id' ORDER BY `userId`") or die($m->error);
 	if($s->num_rows=1){
-		$arr = $s->fetch_array(MYSQLI_ASSOC));
+		$arr = $s->fetch_array(MYSQLI_ASSOC);
 		$u = array();
 		$u['userId'] = $arr['userId'];
 		$u['username']= $arr['username'];
