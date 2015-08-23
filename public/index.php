@@ -53,6 +53,7 @@ $app->get('/rooms', function() use($app, $config, $m) {
 		unset($arr['password']);
 		$rooms[] = $arr;
 	}
+	echo json_encode($rooms);
 });
 
 $app->get('/rooms/:id', function($id) use($app, $config, $m) {
