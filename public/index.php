@@ -34,27 +34,29 @@ $app->get('/users', function() use($app, $config, $m) {
 $app->get('/users/:id', function($id) use($app, $config, $m) {
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `userData` WHERE `userId`='$id' ORDER BY `userId`") or die($m->error);
-	if($s->num_rows=1){
+	if($s->num_rows==1){
 		$arr = $s->fetch_array(MYSQLI_ASSOC);
 		$u = array();
 		$u['userId'] = $arr['userId'];
 		$u['username']= $arr['username'];
 		echo json_encode($u);
+	} else {
+		echo json_encode(array("code" => 204, "message" => "User doesn't exist", "description" => "Unable to locate requested resource.")); 
 	}
-	echo json_encode(array("code" => 204, "message" => "User doesn't exist", "description" => "Unable to locate requested resource.")); 
 });
 
 $app->get('/users/:username', function($id) use($app, $config, $m) {
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `userData` WHERE `username`='$id' ORDER BY `userId`") or die($m->error);
-	if($s->num_rows=1){
+	if($s->num_rows==1){
 		$arr = $s->fetch_array(MYSQLI_ASSOC);
 		$u = array();
 		$u['userId'] = $arr['userId'];
 		$u['username']= $arr['username'];
 		echo json_encode($u);
+	} else {
+		echo json_encode(array("code" => 204, "message" => "User doesn't exist", "description" => "Unable to locate requested resource.")); 	
 	}
-	echo json_encode(array("code" => 204, "message" => "User doesn't exist", "description" => "Unable to locate requested resource.")); 
 });
 
 $app->post('/logout', function() use($app) {
