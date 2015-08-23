@@ -77,7 +77,7 @@ $app->get('/:user/rooms', function($user) use($app, $config, $m) {
 			unset($arr['uniqueId']);
 			$rooms[] = $arr;
 		}
-		echo json_encode($arr);
+		echo json_encode($rooms);
 	} else {
 		echo json_encode(array("code" => 204, "message" => "User does not belong to any rooms", "description" => "Unable to locate requested resource.")); 
 	}
