@@ -68,7 +68,7 @@ $app->get('/rooms/:id', function($id) use($app, $config, $m) {
 	}
 });
 
-$app->get('/:user/rooms', function($user) use($app, $config, $m) {
+$app->get('/users/:user/rooms', function($user) use($app, $config, $m) {
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `roomPerms` WHERE `userId`='$user' ORDER BY `roomId`") or die($m->error);
 	if($s->num_rows>=1){
@@ -104,7 +104,7 @@ $app->get('/playlists/:id', function($id) use($app, $config, $m) {
 	}
 });
 
-$app->get('/:user/playlists', function($user) use($app, $config, $m) {
+$app->get('/users/:user/playlists', function($user) use($app, $config, $m) {
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `playlistPerms` WHERE `userId`='$user' ORDER BY `playlistId`") or die($m->error);
 	if($s->num_rows>=1){
@@ -116,6 +116,66 @@ $app->get('/:user/playlists', function($user) use($app, $config, $m) {
 		echo json_encode($pls);
 	} else {
 		echo json_encode(array("code" => 204, "message" => "User does not belong to any playlists", "description" => "Unable to locate requested resource.")); 
+	}
+});
+
+$app->get('/rooms/:room/songs', function($room) use($app, $config, $m) {
+	$app->response->setStatus(200);
+	$s = $m->query("SELECT * FROM `roomSongs` WHERE `roomId`='$room' ORDER BY `position`") or die($m->error);
+	if($s->num_rows>=1){
+		$songs = array();
+		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
+			unset($arr['uniqueId']);
+			$songs[] = $arr;
+		}
+		echo json_encode($songs);
+	} else {
+		echo json_encode(array("code" => 204, "message" => "There are no songs in this room", "description" => "Unable to locate requested resource.")); 
+	}
+});
+
+$app->get('/rooms/:room/songs/:id', function($room,$id) use($app, $config, $m) {
+	$app->response->setStatus(200);
+	$s = $m->query("SELECT * FROM `roomSongs` WHERE `roomId`='$room'AND`songID`='$id' ORDER BY `position`") or die($m->error);
+	if($s->num_rows>=1){
+		$songs = array();
+		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
+			unset($arr['uniqueId']);
+			$songs[] = $arr;
+		}
+		echo json_encode($songs);
+	} else {
+		echo json_encode(array("code" => 204, "message" => "There are no specified songs in this room", "description" => "Unable to locate requested resource.")); 
+	}
+});
+
+$app->get('/playlists/:playlist/songs', function($pl) use($app, $config, $m) {
+	$app->response->setStatus(200);
+	$s = $m->query("SELECT * FROM `playlistSongs` WHERE `playlistId`='$pl' ORDER BY `position`") or die($m->error);
+	if($s->num_rows>=1){
+		$songs = array();
+		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
+			unset($arr['uniqueId']);
+			$songs[] = $arr;
+		}
+		echo json_encode($songs);
+	} else {
+		echo json_encode(array("code" => 204, "message" => "There are no songs in this playlist", "description" => "Unable to locate requested resource.")); 
+	}
+});
+
+$app->get('/playlists/:playlist/songs/:id', function($pl,$id) use($app, $config, $m) {
+	$app->response->setStatus(200);
+	$s = $m->query("SELECT * FROM `playlistSongs` WHERE `playlistId`='$pl'AND`songID`='$id' ORDER BY `position`") or die($m->error);
+	if($s->num_rows>=1){
+		$songs = array();
+		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
+			unset($arr['uniqueId']);
+			$songs[] = $arr;
+		}
+		echo json_encode($songs);
+	} else {
+		echo json_encode(array("code" => 204, "message" => "There are no specified songs in this playlist", "description" => "Unable to locate requested resource.")); 
 	}
 });
 
