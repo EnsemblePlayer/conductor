@@ -5,11 +5,31 @@ require_once '../app/middleware/APIResponseMiddleware.php';
 $config = require_once '../app/config.php';
 $app = new \Slim\Slim($config['slim']);
 $app->add(new \middleware\APIResponseMiddleware($config));
+$m = mysqli_connect("localhost","root","teotauy18","secondEnsemble");
+//$m->query("") or die($m->error);
+if (!$m) {
+    echo json_encode(array("code" => 500, "message" => "Could not connect", "description" => "Unable to locate requested resource."));
+}
 
 $app->get('/', function() use($app, $config) {
     $app->response->setStatus(200);
     echo json_encode(array("name" => "conductor", "version" => $config['conductor']['version'], "timestamp" => date_timestamp_get(date_create())));
-}); 
+});
+
+$app->get('/users', function() use($app, $config, $m) {
+	$app->response->setStatus(200);
+	$s = $m->query("SELECT * FROM `userData` ORDER BY `userId`") or die($m->error);
+	$users = array();
+	while($arr = $s->fetch_array(MYSQLI_ASSOC)){
+	//	unset($arr['password']);
+	//	$users[] = $arr;
+		$u = array();
+		$u['userId'] = $arr['userId'];
+		$u['username']= $arr['username'];
+		$users[] = $u;
+	}
+	echo json_encode($users);
+});	
 
 $app->post('/logout', function() use($app) {
 	// TODO: Revoke session key
