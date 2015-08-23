@@ -83,7 +83,41 @@ $app->get('/:user/rooms', function($user) use($app, $config, $m) {
 	}
 });
 
+$app->get('/playlists', function() use($app, $config, $m) {
+	$app->response->setStatus(200);
+	$s = $m->query("SELECT * FROM `playlistData` ORDER BY `playlistId`") or die($m->error);
+	$pls = array();
+	while($arr = $s->fetch_array(MYSQLI_ASSOC)){
+		$pls[] = $arr;
+	}
+	echo json_encode($pls);
+});
 
+$app->get('/playlists/:id', function($id) use($app, $config, $m) {
+	$app->response->setStatus(200);
+	$s = $m->query("SELECT * FROM `playlistData` WHERE `playlistId`='$id' ORDER BY `roomId`") or die($m->error);
+	if($s->num_rows==1){
+		$arr = $s->fetch_array(MYSQLI_ASSOC);
+		echo json_encode($arr);
+	} else {
+		echo json_encode(array("code" => 204, "message" => "Playlist doesn't exist", "description" => "Unable to locate requested resource.")); 
+	}
+});
+
+$app->get('/:user/playlists', function($user) use($app, $config, $m) {
+	$app->response->setStatus(200);
+	$s = $m->query("SELECT * FROM `playlistPerms` WHERE `userId`='$user' ORDER BY `roomId`") or die($m->error);
+	if($s->num_rows>=1){
+		$pls = array();
+		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
+			unset($arr['uniqueId']);
+			$pls[] = $arr;
+		}
+		echo json_encode($pls);
+	} else {
+		echo json_encode(array("code" => 204, "message" => "User does not belong to any playlists", "description" => "Unable to locate requested resource.")); 
+	}
+});
 
 $app->post('/logout', function() use($app) {
 	// TODO: Revoke session key
