@@ -95,7 +95,7 @@ $app->get('/playlists', function() use($app, $config, $m) {
 
 $app->get('/playlists/:id', function($id) use($app, $config, $m) {
 	$app->response->setStatus(200);
-	$s = $m->query("SELECT * FROM `playlistData` WHERE `playlistId`='$id' ORDER BY `roomId`") or die($m->error);
+	$s = $m->query("SELECT * FROM `playlistData` WHERE `playlistId`='$id' ORDER BY `playlistId`") or die($m->error);
 	if($s->num_rows==1){
 		$arr = $s->fetch_array(MYSQLI_ASSOC);
 		echo json_encode($arr);
@@ -106,7 +106,7 @@ $app->get('/playlists/:id', function($id) use($app, $config, $m) {
 
 $app->get('/:user/playlists', function($user) use($app, $config, $m) {
 	$app->response->setStatus(200);
-	$s = $m->query("SELECT * FROM `playlistPerms` WHERE `userId`='$user' ORDER BY `roomId`") or die($m->error);
+	$s = $m->query("SELECT * FROM `playlistPerms` WHERE `userId`='$user' ORDER BY `playlistId`") or die($m->error);
 	if($s->num_rows>=1){
 		$pls = array();
 		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
