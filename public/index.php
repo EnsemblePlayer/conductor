@@ -179,6 +179,66 @@ $app->get('/playlists/:playlist/songs/:id', function($pl,$id) use($app, $config,
 	}
 });
 
+$app->get('/rooms/:room/permissions', function($room) use($app, $config, $m) {
+	$app->response->setStatus(200);
+	$s = $m->query("SELECT * FROM `roomPerms` WHERE `roomId`='$room' ORDER BY `userId`") or die($m->error);
+	if($s->num_rows>=1){
+		$u = array();
+		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
+			unset($arr['uniqueId']);
+			$u[] = $arr;
+		}
+		echo json_encode($u);
+	} else {
+		echo json_encode(array("code" => 204, "message" => "That room has no users associated with it", "description" => "Unable to locate requested resource.")); 
+	}
+});
+
+$app->get('/rooms/:room/permissions/:user', function($room,$user) use($app, $config, $m) {
+	$app->response->setStatus(200);
+	$s = $m->query("SELECT * FROM `roomPerms` WHERE `roomId`='$room'AND`userId`='$user' ORDER BY `userId`") or die($m->error);
+	if($s->num_rows>=1){
+		$u = array();
+		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
+			unset($arr['uniqueId']);
+			$u[] = $arr;
+		}
+		echo json_encode($u);
+	} else {
+		echo json_encode(array("code" => 204, "message" => "That room has no permissions for the specified user", "description" => "Unable to locate requested resource.")); 
+	}
+});
+
+$app->get('/playlists/:playlist/permissions', function($pl) use($app, $config, $m) {
+	$app->response->setStatus(200);
+	$s = $m->query("SELECT * FROM `playlistPerms` WHERE `playlistId`='$pl' ORDER BY `userId`") or die($m->error);
+	if($s->num_rows>=1){
+		$u = array();
+		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
+			unset($arr['uniqueId']);
+			$u[] = $arr;
+		}
+		echo json_encode($u);
+	} else {
+		echo json_encode(array("code" => 204, "message" => "That playlist has no users associated with it", "description" => "Unable to locate requested resource.")); 
+	}
+});
+
+$app->get('/playlists/:playlist/permissions/:user', function($pl,$user) use($app, $config, $m) {
+	$app->response->setStatus(200);
+	$s = $m->query("SELECT * FROM `playlistPerms` WHERE `playlistId`='$pl'AND`userId`='$user' ORDER BY `userId`") or die($m->error);
+	if($s->num_rows>=1){
+		$u = array();
+		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
+			unset($arr['uniqueId']);
+			$u[] = $arr;
+		}
+		echo json_encode($u);
+	} else {
+		echo json_encode(array("code" => 204, "message" => "That playlist has no permissions for the specified user", "description" => "Unable to locate requested resource.")); 
+	}
+});
+
 $app->post('/logout', function() use($app) {
 	// TODO: Revoke session key
     $app->response->setStatus(200);
