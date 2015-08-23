@@ -45,19 +45,44 @@ $app->get('/users/:id', function($id) use($app, $config, $m) {
 	}
 });
 
-$app->get('/users/:username', function($id) use($app, $config, $m) {
+$app->get('/rooms', function() use($app, $config, $m) {
 	$app->response->setStatus(200);
-	$s = $m->query("SELECT * FROM `userData` WHERE `username`='$id' ORDER BY `userId`") or die($m->error);
-	if($s->num_rows==1){
-		$arr = $s->fetch_array(MYSQLI_ASSOC);
-		$u = array();
-		$u['userId'] = $arr['userId'];
-		$u['username']= $arr['username'];
-		echo json_encode($u);
-	} else {
-		echo json_encode(array("code" => 204, "message" => "User doesn't exist", "description" => "Unable to locate requested resource.")); 	
+	$s = $m->query("SELECT * FROM `roomData` ORDER BY `roomId`") or die($m->error);
+	$rooms = array();
+	while($arr = $s->fetch_array(MYSQLI_ASSOC)){
+		unset($arr['password']);
+		$rooms[] = $arr;
 	}
 });
+
+$app->get('/rooms/:id', function($id) use($app, $config, $m) {
+	$app->response->setStatus(200);
+	$s = $m->query("SELECT * FROM `roomData` WHERE `roomId`='$id' ORDER BY `roomId`") or die($m->error);
+	if($s->num_rows==1){
+		$arr = $s->fetch_array(MYSQLI_ASSOC);
+		unset($arr['password']);
+		echo json_encode($arr);
+	} else {
+		echo json_encode(array("code" => 204, "message" => "Room doesn't exist", "description" => "Unable to locate requested resource.")); 
+	}
+});
+
+$app->get('/:user/rooms', function($user) use($app, $config, $m) {
+	$app->response->setStatus(200);
+	$s = $m->query("SELECT * FROM `roomPerms` WHERE `userId`='$user' ORDER BY `roomId`") or die($m->error);
+	if($s->num_rows>=1){
+		$rooms = array();
+		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
+			unset($arr['uniqueId']);
+			$rooms[] = $arr;
+		}
+		echo json_encode($arr);
+	} else {
+		echo json_encode(array("code" => 204, "message" => "User does not belong to any rooms", "description" => "Unable to locate requested resource.")); 
+	}
+});
+
+
 
 $app->post('/logout', function() use($app) {
 	// TODO: Revoke session key
