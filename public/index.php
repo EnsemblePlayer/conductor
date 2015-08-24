@@ -305,6 +305,16 @@ $app->post('/playlists/:id', function ($id) use ($app, $config, $m) {
 	$app->response->setStatus(200);
 });
 
+$app->post('/rooms/:room/songs', function ($roomId) use ($app, $config, $m) {
+    $priority = $app->request->post('priority');
+	$userId = $app->request->post('userId');
+	$songId = $app->request->post('songId');
+	$position = $app->request->post('position');
+	//change position
+    $m->query("INSERT INTO `roomSongs` (`priority`,`position`,`userId`,`songId`,`roomId`) VALUES ('$priority','$position','$userId','$songId','$roomId')")or die($m->error);
+	$app->response->setStatus(200);
+});
+
 $app->post('/logout', function() use($app) {
 	// TODO: Revoke session key
     $app->response->setStatus(200);
