@@ -13,7 +13,7 @@ if (!$m) {
 
 $app->get('/', function() use($app, $config) {
     $app->response->setStatus(200);
-    echo json_encode(array("name" => "conductor", "version" => $config['conductor']['version'], "timestamp" => date_timestamp_get(date_create())));
+    echo json_encode(array("name" => "conductor", "version" => $config['conductor']['version']));
 });
 
 $app->get('/users', function() use($app, $config, $m) {

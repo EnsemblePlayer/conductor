@@ -15,6 +15,7 @@ class APIResponseMiddleware extends \Slim\Middleware {
 
         $app->response()->headers->set('Content-Type', 'application/json');
         $res->headers->set('X-Api-Version', $this->config['conductor']['version']);
+        $res->headers->set('X-Timestamp', date_timestamp_get(date_create());
 
         $this->next->call();
     }
