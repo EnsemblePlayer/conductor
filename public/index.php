@@ -255,7 +255,6 @@ $app->post('/rooms/:id', function ($id) use ($app, $config, $m) {
 	$userId = $app->request->post('userId');
     $m->query("INSERT INTO `roomData` (`name`,`password`,`userId`) VALUES ('$name','$password','$userId')") or die($m->error);
 	$roomId = $m->insert_id;
-	echo $roomId;
 	$m->query("INSERT INTO `roomPerms` (`level`,`roomId`,`userId`) VALUES ('4','$roomId','$userId')") or die($m->error);
 	$s = $m->query("SELECT * FROM `roomPerms` WHERE `roomId`='$id' ORDER BY `userId`") or die($m->error);
 	while($arr = $s->fetch_array(MYSQLI_ASSOC)){
@@ -263,9 +262,7 @@ $app->post('/rooms/:id', function ($id) use ($app, $config, $m) {
 		$l = $arr['level'];
 		$m->query("INSERT INTO `roomPerms` (`userId`,`level`,`roomId`) VALUES ('$u','$l','$roomId')") or die($m->error);
 	}
-	echo $roomId;
 	$s = $m->query("SELECT * FROM `roomSongs` WHERE `roomId`='$id' ORDER BY `userId`") or die($m->error);
-	echo $roomId;
 	while($arr = $s->fetch_array(MYSQLI_ASSOC)){
 		$u = $arr['userId'];
 		$l = $arr['position'];
@@ -273,7 +270,38 @@ $app->post('/rooms/:id', function ($id) use ($app, $config, $m) {
 		$sid = $arr['songId'];
 		$m->query("INSERT INTO `roomSongs` (`userId`,`position`,`roomId`,`priority`,`songId`) VALUES ('$u','$l','$roomId','$p','$sid')") or die($m->error);
 	}	
-	echo $roomId;
+	$app->response->setStatus(200);
+});
+
+$app->post('/playlists', function () use ($app, $config, $m) {
+    $name = $app->request->post('name');
+	$userId = $app->request->post('userId');
+    $m->query("INSERT INTO `playlistData` (`name`,`userId`) VALUES ('$name','$userId')")or die($m->error);
+	$playlistId = $m->insert_id;
+	$m->query("INSERT INTO `playlistPerms` (`level`,`playlistId`,`userId`) VALUES ('4','$playlistId','$userId')")or die($m->error);
+	$app->response->setStatus(200);
+});
+
+$app->post('/playlists/:id', function ($id) use ($app, $config, $m) {
+    $name = $app->request->post('name');
+	$userId = $app->request->post('userId');
+    $m->query("INSERT INTO `playlistData` (`name`,`userId`) VALUES ('$name','$userId')") or die($m->error);
+	$playlistId = $m->insert_id;
+	$m->query("INSERT INTO `playlistPerms` (`level`,`playlistId`,`userId`) VALUES ('4','$playlistId','$userId')") or die($m->error);
+	$s = $m->query("SELECT * FROM `playlistPerms` WHERE `playlistId`='$id' ORDER BY `userId`") or die($m->error);
+	while($arr = $s->fetch_array(MYSQLI_ASSOC)){
+		$u = $arr['userId'];
+		$l = $arr['level'];
+		$m->query("INSERT INTO `playlistPerms` (`userId`,`level`,`playlistId`) VALUES ('$u','$l','$playlistId')") or die($m->error);
+	}
+	$s = $m->query("SELECT * FROM `playlistSongs` WHERE `playlistId`='$id' ORDER BY `userId`") or die($m->error);
+	while($arr = $s->fetch_array(MYSQLI_ASSOC)){
+		$u = $arr['userId'];
+		$l = $arr['position'];
+		$p = $arr['priority'];
+		$sid = $arr['songId'];
+		$m->query("INSERT INTO `playlistSongs` (`userId`,`position`,`playlistId`,`priority`,`songId`) VALUES ('$u','$l','$playlistId','$p','$sid')") or die($m->error);
+	}	
 	$app->response->setStatus(200);
 });
 
