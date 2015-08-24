@@ -239,6 +239,13 @@ $app->get('/playlists/:playlist/permissions/:user', function($pl,$user) use($app
 	}
 });
 
+$app->post('/rooms', function () use ($app) {
+    $name = $app->request->post('name');
+	$password = $app->request->post('password');
+	$userId = $app->request->post('userId');
+    echo $name,$password,$userId;
+});
+
 $app->post('/logout', function() use($app) {
 	// TODO: Revoke session key
     $app->response->setStatus(200);
