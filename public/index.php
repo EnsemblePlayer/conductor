@@ -244,7 +244,7 @@ $app->post('/rooms', function () use ($app) {
 	$password = $app->request->post('password');
 	$userId = $app->request->post('userId');
     //$m->query("INSERT INTO `roomData` (`name`,`password`,`userId`) VALUES ('$name','$password','$userId')");
-	//$app->response->setStatus(200);
+	$app->response->setStatus(200);
 });
 
 $app->post('/logout', function() use($app) {
