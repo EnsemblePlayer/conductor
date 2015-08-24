@@ -263,16 +263,12 @@ $app->post('/rooms/:id', function ($id) use ($app, $config, $m) {
 		$m->query("INSERT INTO 'roomPerms' (`userId`,`level`,`roomId`) VALUES ('$u','$l','$roomId')");
 	}
 	$s = $m->query("SELECT * FROM `roomSongs` WHERE `roomId`='$id' ORDER BY `userId`") or die($m->error);
-	if($s->num_rows==0)
-		echo "error";
-	else
-		echo "HI THOMAS";
 	while($arr = $s->fetch_array(MYSQLI_ASSOC)){
 		$u = $arr['userId'];
 		$l = $arr['position'];
 		$p = $arr['priority'];
 		$sid = $arr['songId'];
-		$m->query("INSERT INTO 'roomSongs' (`userId`,`position`,`roomId`,'priority','songId') VALUES ('$u','$l','$roomId','$p','$sid')");
+		$m->query("INSERT INTO 'roomSongs' (`userId`,`position`,`roomId`,`priority`,`songId`) VALUES ('$u','$l','$roomId','$p','$sid')") or die($m->error);
 	}	
 	$app->response->setStatus(200);
 });
