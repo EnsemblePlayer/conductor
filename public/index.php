@@ -317,7 +317,7 @@ $app->post('/rooms/:room/songs', function ($roomId) use ($app, $config, $m) {
 
 $app->post('/rooms/:room/songs/:id', function ($roomId,$sid) use ($app, $config, $m) {
 	$s = $m->query("SELECT * FROM `roomSongs` WHERE `songId`='$sid' ORDER BY `position` LIMIT 1") or die($m->error);
-	$arr = $s->fetch_array(MYSQLI_ASSOC)
+	$arr = $s->fetch_array(MYSQLI_ASSOC);
 	$priority = $arr['priority'];
 	$userId = $app->request->post('userId');
 	$position = $app->request->post('position');
@@ -338,7 +338,7 @@ $app->post('/playlists/:playlist/songs', function ($playlistId) use ($app, $conf
 
 $app->post('/playlists/:playlist/songs/:id', function ($playlistId,$sid) use ($app, $config, $m) {
 	$s = $m->query("SELECT * FROM `playlistSongs` WHERE `songId`='$sid' ORDER BY `position` LIMIT 1") or die($m->error);
-	$arr = $s->fetch_array(MYSQLI_ASSOC)
+	$arr = $s->fetch_array(MYSQLI_ASSOC);
 	$priority = $arr['priority'];
 	$userId = $app->request->post('userId');
 	$position = $app->request->post('position');
