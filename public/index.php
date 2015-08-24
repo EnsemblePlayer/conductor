@@ -267,7 +267,7 @@ $app->post('/rooms/:id', function ($id) use ($app, $config, $m) {
 		$u = $arr['userId'];
 		$l = $arr['position'];
 		$p = $arr['priority'];
-		$sid = $arry['songId'];
+		$sid = $arr['songId'];
 		$m->query("INSERT INTO 'roomSongs' (`userId`,`position`,`roomId`,'priority','songId') VALUES ('$u','$l','$roomId','$p','$sid')");
 	}	
 	$app->response->setStatus(200);
