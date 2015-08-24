@@ -400,7 +400,7 @@ $app->post('/rooms/:room/permissions', function ($roomId) use ($app, $config, $m
 });
 
 $app->post('/playlists/:playlist/permissions', function ($playlistId) use ($app, $config, $m) {
-	$s = $m->query("SELECT * FROM `playlistData` WHERE `roomId`='$playlistId' ORDER BY `playlistId`") or die ($m->error);
+	$s = $m->query("SELECT * FROM `playlistData` WHERE `playlistId`='$playlistId' ORDER BY `playlistId`") or die ($m->error);
 	if($s->num_rows>=1){
 		$userId = $app->request->post('userId');
 		$level = $app->request->post('level');		
