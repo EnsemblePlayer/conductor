@@ -265,6 +265,8 @@ $app->post('/rooms/:id', function ($id) use ($app, $config, $m) {
 	$s = $m->query("SELECT * FROM `roomSongs` WHERE `roomId`='$id' ORDER BY `userId`") or die($m->error);
 	if($s->num_rows==0)
 		echo "error";
+	else
+		echo "HI THOMAS";
 	while($arr = $s->fetch_array(MYSQLI_ASSOC)){
 		$u = $arr['userId'];
 		$l = $arr['position'];
