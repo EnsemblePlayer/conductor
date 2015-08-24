@@ -315,6 +315,38 @@ $app->post('/rooms/:room/songs', function ($roomId) use ($app, $config, $m) {
 	$app->response->setStatus(200);
 });
 
+$app->post('/rooms/:room/songs/:id', function ($roomId,$sid) use ($app, $config, $m) {
+	$s = $m->query("SELECT * FROM `roomSongs` WHERE `songId`='$sid' ORDER BY `position` LIMIT 1") or die($m->error);
+	$arr = $s->fetch_array(MYSQLI_ASSOC)
+	$priority = $arr['priority'];
+	$userId = $app->request->post('userId');
+	$position = $app->request->post('position');
+	//change position
+    $m->query("INSERT INTO `roomSongs` (`priority`,`position`,`userId`,`songId`,`roomId`) VALUES ('$priority','$position','$userId','$sid','$roomId')")or die($m->error);
+	$app->response->setStatus(200);
+});
+
+$app->post('/playlists/:playlist/songs', function ($playlistId) use ($app, $config, $m) {
+    $priority = $app->request->post('priority');
+	$userId = $app->request->post('userId');
+	$songId = $app->request->post('songId');
+	$position = $app->request->post('position');
+	//change position
+    $m->query("INSERT INTO `playlistSongs` (`priority`,`position`,`userId`,`songId`,`playlistId`) VALUES ('$priority','$position','$userId','$songId','$playlistId')")or die($m->error);
+	$app->response->setStatus(200);
+});
+
+$app->post('/playlists/:playlist/songs/:id', function ($playlistId,$sid) use ($app, $config, $m) {
+	$s = $m->query("SELECT * FROM `playlistSongs` WHERE `songId`='$sid' ORDER BY `position` LIMIT 1") or die($m->error);
+	$arr = $s->fetch_array(MYSQLI_ASSOC)
+	$priority = $arr['priority'];
+	$userId = $app->request->post('userId');
+	$position = $app->request->post('position');
+	//change position
+    $m->query("INSERT INTO `playlistSongs` (`priority`,`position`,`userId`,`songId`,`playlistId`) VALUES ('$priority','$position','$userId','$sid','$playlistId')")or die($m->error);
+	$app->response->setStatus(200);
+});
+
 $app->post('/logout', function() use($app) {
 	// TODO: Revoke session key
     $app->response->setStatus(200);
