@@ -243,9 +243,9 @@ $app->post('/rooms', function () use ($app, $config, $m) {
     $name = $app->request->post('name');
 	$password = $app->request->post('password');
 	$userId = $app->request->post('userId');
-    $m->query("INSERT INTO `roomData` (`name`,`password`,`userId`) VALUES ('$name','$password','$userId')");
+    $m->query("INSERT INTO `roomData` (`name`,`password`,`userId`) VALUES ('$name','$password','$userId')")or die($m->error);
 	$roomId = $m->insert_id;
-	$m->query("INSERT INTO `roomPerms` (`level`,`roomId`,`userId`) VALUES ('4','$roomId','$userId')");
+	$m->query("INSERT INTO `roomPerms` (`level`,`roomId`,`userId`) VALUES ('4','$roomId','$userId')")or die($m->error);
 	$app->response->setStatus(200);
 });
 
@@ -253,15 +253,15 @@ $app->post('/rooms/:id', function ($id) use ($app, $config, $m) {
     $name = $app->request->post('name');
 	$password = $app->request->post('password');
 	$userId = $app->request->post('userId');
-    $m->query("INSERT INTO `roomData` (`name`,`password`,`userId`) VALUES ('$name','$password','$userId')" or die($m->error));
+    $m->query("INSERT INTO `roomData` (`name`,`password`,`userId`) VALUES ('$name','$password','$userId')") or die($m->error);
 	$roomId = $m->insert_id;
 	echo $roomId;
-	$m->query("INSERT INTO `roomPerms` (`level`,`roomId`,`userId`) VALUES ('4','$roomId','$userId')" or die($m->error));
+	$m->query("INSERT INTO `roomPerms` (`level`,`roomId`,`userId`) VALUES ('4','$roomId','$userId')") or die($m->error);
 	$s = $m->query("SELECT * FROM `roomPerms` WHERE `roomId`='$id' ORDER BY `userId`") or die($m->error);
 	while($arr = $s->fetch_array(MYSQLI_ASSOC)){
 		$u = $arr['userId'];
 		$l = $arr['level'];
-		$m->query("INSERT INTO `roomPerms` (`userId`,`level`,`roomId`) VALUES ('$u','$l','$roomId')" or die($m->error));
+		$m->query("INSERT INTO `roomPerms` (`userId`,`level`,`roomId`) VALUES ('$u','$l','$roomId')") or die($m->error);
 	}
 	echo $roomId;
 	$s = $m->query("SELECT * FROM `roomSongs` WHERE `roomId`='$id' ORDER BY `userId`") or die($m->error);
