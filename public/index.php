@@ -338,7 +338,7 @@ $app->post('/playlists/:playlist/songs', function ($playlistId) use ($app, $conf
 	$songId = $app->request->post('songId');
 	$position = $app->request->post('position');
 	//change position
-	$app->response->setStatus(200);
+	$app->response->setStatus(201);
     $m->query("INSERT INTO `playlistSongs` (`priority`,`position`,`userId`,`songId`,`playlistId`) VALUES ('$priority','$position','$userId','$songId','$playlistId')")or die($m->error);
 });
 
@@ -349,7 +349,7 @@ $app->post('/playlists/:playlist/songs/:id', function ($playlistId,$sid) use ($a
 		$priority = $arr['priority'];
 		$userId = $app->request->post('userId');
 		$position = $app->request->post('position');
-		$app->response->setStatus(200);
+		$app->response->setStatus(201);
 		//change position
 		$m->query("INSERT INTO `playlistSongs` (`priority`,`position`,`userId`,`songId`,`playlistId`) VALUES ('$priority','$position','$userId','$sid','$playlistId')")or die($m->error);
 	}
