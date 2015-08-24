@@ -224,7 +224,7 @@ $app->get('/playlists/:playlist/permissions', function($pl) use($app, $config, $
 	}
 });
 
-$app->get('/playlists/:playlist/permissions/:user', function($pl,$user) use($app, $config, $m) {
+$app->get('/playlists/:playlist/permissions/:user', function($pl,$user) use($appa, $config, $m) {
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `playlistPerms` WHERE `playlistId`='$pl'AND`userId`='$user' ORDER BY `userId`") or die($m->error);
 	if($s->num_rows>=1){
@@ -239,7 +239,7 @@ $app->get('/playlists/:playlist/permissions/:user', function($pl,$user) use($app
 	}
 });
 
-$app->post('/rooms', function () use ($app) {
+$app->post('/rooms', function () use ($app, $config, $m) {
     $name = $app->request->post('name');
 	$password = $app->request->post('password');
 	$userId = $app->request->post('userId');
