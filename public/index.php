@@ -243,7 +243,7 @@ $app->post('/rooms', function () use ($app) {
     $name = $app->request->post('name');
 	$password = $app->request->post('password');
 	$userId = $app->request->post('userId');
-    $m->query("INSERT INTO `roomData` (`name`,`password`,`userId`) VALUES ('$name','$password','$userId')");
+    //$m->query("INSERT INTO `roomData` (`name`,`password`,`userId`) VALUES ('$name','$password','$userId')");
 	$app->response->setStatus(200);
 });
 
