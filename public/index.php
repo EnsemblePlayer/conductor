@@ -253,24 +253,30 @@ $app->post('/rooms/:id', function ($id) use ($app, $config, $m) {
     $name = $app->request->post('name');
 	$password = $app->request->post('password');
 	$userId = $app->request->post('userId');
-    $m->query("INSERT INTO `roomData` (`name`,`password`,`userId`) VALUES ('$name','$password','$userId')") or die($m->error);
 	$roomId = $m->insert_id;
 	$m->query("INSERT INTO `roomPerms` (`level`,`roomId`,`userId`) VALUES ('4','$roomId','$userId')") or die($m->error);
 	$s = $m->query("SELECT * FROM `roomPerms` WHERE `roomId`='$id' ORDER BY `userId`") or die($m->error);
-	while($arr = $s->fetch_array(MYSQLI_ASSOC)){
-		$u = $arr['userId'];
-		$l = $arr['level'];
-		$m->query("INSERT INTO `roomPerms` (`userId`,`level`,`roomId`) VALUES ('$u','$l','$roomId')") or die($m->error);
+	if($s->num_rows>=1){
+		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
+			$u = $arr['userId'];
+			$l = $arr['level'];
+			$m->query("INSERT INTO `roomPerms` (`userId`,`level`,`roomId`) VALUES ('$u','$l','$roomId')") or die($m->error);
+		}
+		$m->query("INSERT INTO `roomData` (`name`,`password`,`userId`) VALUES ('$name','$password','$userId')") or die($m->error);
+		$s = $m->query("SELECT * FROM `roomSongs` WHERE `roomId`='$id' ORDER BY `userId`") or die($m->error);
+		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
+			$u = $arr['userId'];
+			$l = $arr['position'];
+			$p = $arr['priority'];
+			$sid = $arr['songId'];
+			$m->query("INSERT INTO `roomSongs` (`userId`,`position`,`roomId`,`priority`,`songId`) VALUES ('$u','$l','$roomId','$p','$sid')") or die($m->error);
+		}	
+		$app->response->setStatus(201);
 	}
-	$s = $m->query("SELECT * FROM `roomSongs` WHERE `roomId`='$id' ORDER BY `userId`") or die($m->error);
-	while($arr = $s->fetch_array(MYSQLI_ASSOC)){
-		$u = $arr['userId'];
-		$l = $arr['position'];
-		$p = $arr['priority'];
-		$sid = $arr['songId'];
-		$m->query("INSERT INTO `roomSongs` (`userId`,`position`,`roomId`,`priority`,`songId`) VALUES ('$u','$l','$roomId','$p','$sid')") or die($m->error);
+	else {
+		$app->response->setStatus(400);
+		echo json_encode(array("code" => 400, "message" => "The specified room does not exist", "description" => "Unable to locate requested resource.")); 
 	}	
-	$app->response->setStatus(201);
 });
 
 $app->post('/playlists', function () use ($app, $config, $m) {
@@ -285,38 +291,51 @@ $app->post('/playlists', function () use ($app, $config, $m) {
 $app->post('/playlists/:id', function ($id) use ($app, $config, $m) {
     $name = $app->request->post('name');
 	$userId = $app->request->post('userId');
-    $m->query("INSERT INTO `playlistData` (`name`,`userId`) VALUES ('$name','$userId')") or die($m->error);
 	$playlistId = $m->insert_id;
 	$m->query("INSERT INTO `playlistPerms` (`level`,`playlistId`,`userId`) VALUES ('4','$playlistId','$userId')") or die($m->error);
 	$s = $m->query("SELECT * FROM `playlistPerms` WHERE `playlistId`='$id' ORDER BY `userId`") or die($m->error);
-	while($arr = $s->fetch_array(MYSQLI_ASSOC)){
-		$u = $arr['userId'];
-		$l = $arr['level'];
-		$m->query("INSERT INTO `playlistPerms` (`userId`,`level`,`playlistId`) VALUES ('$u','$l','$playlistId')") or die($m->error);
+	if($s->num_rows>=1){
+		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
+			$u = $arr['userId'];
+			$l = $arr['level'];
+			$m->query("INSERT INTO `playlistPerms` (`userId`,`level`,`playlistId`) VALUES ('$u','$l','$playlistId')") or die($m->error);
+		}
+		$m->query("INSERT INTO `playlistData` (`name`,`userId`) VALUES ('$name','$userId')") or die($m->error);
+		$s = $m->query("SELECT * FROM `playlistSongs` WHERE `playlistId`='$id' ORDER BY `userId`") or die($m->error);
+		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
+			$u = $arr['userId'];
+			$l = $arr['position'];
+			$p = $arr['priority'];
+			$sid = $arr['songId'];
+			$m->query("INSERT INTO `playlistSongs` (`userId`,`position`,`playlistId`,`priority`,`songId`) VALUES ('$u','$l','$playlistId','$p','$sid')") or die($m->error);
+		}	
+		$app->response->setStatus(201);
 	}
-	$s = $m->query("SELECT * FROM `playlistSongs` WHERE `playlistId`='$id' ORDER BY `userId`") or die($m->error);
-	while($arr = $s->fetch_array(MYSQLI_ASSOC)){
-		$u = $arr['userId'];
-		$l = $arr['position'];
-		$p = $arr['priority'];
-		$sid = $arr['songId'];
-		$m->query("INSERT INTO `playlistSongs` (`userId`,`position`,`playlistId`,`priority`,`songId`) VALUES ('$u','$l','$playlistId','$p','$sid')") or die($m->error);
-	}	
-	$app->response->setStatus(201);
+	else {
+		$app->response->setStatus(400);
+		echo json_encode(array("code" => 400, "message" => "The specified playlist does not exist", "description" => "Unable to locate requested resource.")); 
+	}
 });
 
 $app->post('/rooms/:room/songs', function ($roomId) use ($app, $config, $m) {
-    $priority = $app->request->post('priority');
-	$userId = $app->request->post('userId');
-	$songId = $app->request->post('songId');
-	$position = $app->request->post('position');
-	//change position
-    $m->query("INSERT INTO `roomSongs` (`priority`,`position`,`userId`,`songId`,`roomId`) VALUES ('$priority','$position','$userId','$songId','$roomId')")or die($m->error);
-	$app->response->setStatus(201);
+    $s = $m->query("SELECT * FROM `roomData` WHERE `roomId`='$roomId' ORDER BY `roomId`") or die ($m->error);
+	if($s->num_rows>=1){
+		$priority = $app->request->post('priority');
+		$userId = $app->request->post('userId');
+		$songId = $app->request->post('songId');
+		$position = $app->request->post('position');
+		//change position
+		$m->query("INSERT INTO `roomSongs` (`priority`,`position`,`userId`,`songId`,`roomId`) VALUES ('$priority','$position','$userId','$songId','$roomId')")or die($m->error);
+		$app->response->setStatus(201);
+	}
+	else {
+		$app->response->setStatus(400);
+		echo json_encode(array("code" => 400, "message" => "The specified room does not exist", "description" => "Unable to locate requested resource.")); 
+	}
 });
 
 $app->post('/rooms/:room/songs/:id', function ($roomId,$sid) use ($app, $config, $m) {
-		$s = $m->query("SELECT * FROM `roomSongs` WHERE `songId`='$sid' ORDER BY `position` LIMIT 1") or die($m->error);
+	$s = $m->query("SELECT * FROM `roomSongs` WHERE `songId`='$sid'AND`roomId`='$roomId' ORDER BY `position` LIMIT 1") or die($m->error);
 	if($s->num_rows>=1){
 		$arr = $s->fetch_array(MYSQLI_ASSOC);
 		$priority = $arr['priority'];
@@ -333,17 +352,24 @@ $app->post('/rooms/:room/songs/:id', function ($roomId,$sid) use ($app, $config,
 });
 
 $app->post('/playlists/:playlist/songs', function ($playlistId) use ($app, $config, $m) {
-    $priority = $app->request->post('priority');
-	$userId = $app->request->post('userId');
-	$songId = $app->request->post('songId');
-	$position = $app->request->post('position');
-	//change position
-	$app->response->setStatus(201);
-    $m->query("INSERT INTO `playlistSongs` (`priority`,`position`,`userId`,`songId`,`playlistId`) VALUES ('$priority','$position','$userId','$songId','$playlistId')")or die($m->error);
+    $s = $m->query("SELECT * FROM `playlistData` WHERE `playlistId`='$playlistId' ORDER BY `playlistId`") or die ($m->error);
+	if($s->num_rows>=1){
+		$priority = $app->request->post('priority');
+		$userId = $app->request->post('userId');
+		$songId = $app->request->post('songId');
+		$position = $app->request->post('position');
+		//change position
+		$app->response->setStatus(201);
+		$m->query("INSERT INTO `playlistSongs` (`priority`,`position`,`userId`,`songId`,`playlistId`) VALUES ('$priority','$position','$userId','$songId','$playlistId')")or die($m->error);
+	}
+	else {
+		$app->response->setStatus(400);
+		echo json_encode(array("code" => 400, "message" => "The specified playlist does not exist", "description" => "Unable to locate requested resource.")); 
+	}
 });
 
 $app->post('/playlists/:playlist/songs/:id', function ($playlistId,$sid) use ($app, $config, $m) {
-	$s = $m->query("SELECT * FROM `playlistSongs` WHERE `songId`='$sid' ORDER BY `position` LIMIT 1") or die($m->error);
+	$s = $m->query("SELECT * FROM `playlistSongs` WHERE `songId`='$sid'AND`playlistId`='$playlistId' ORDER BY `position` LIMIT 1") or die($m->error);
 	if($s->num_rows>=1){
 		$arr = $s->fetch_array(MYSQLI_ASSOC);
 		$priority = $arr['priority'];
@@ -357,6 +383,34 @@ $app->post('/playlists/:playlist/songs/:id', function ($playlistId,$sid) use ($a
 		$app->response->setStatus(400);
 		echo json_encode(array("code" => 400, "message" => "There are no specified songs in this playlist", "description" => "Unable to locate requested resource.")); 
 	}
+});
+
+$app->post('/rooms/:room/permissions', function ($roomId) use ($app, $config, $m) {
+	$s = $m->query("SELECT * FROM `roomData` WHERE `roomId`='$roomId' ORDER BY `roomId`") or die ($m->error);
+	if($s->num_rows>=1){
+		$userId = $app->request->post('userId');
+		$level = $app->request->post('level');		
+		$app->response->setStatus(201);
+	$m->query("INSERT INTO `roomPerms` (`userId`,`level`,`roomId`) VALUES ('$userId','$level','$roomId')")or die($m->error);
+	}
+	else {
+		$app->response->setStatus(400);
+		echo json_encode(array("code" => 400, "message" => "The specified room does not exist", "description" => "Unable to locate requested resource.")); 
+	}	
+});
+
+$app->post('/playlists/:playlist/permissions', function ($playlistId) use ($app, $config, $m) {
+	$s = $m->query("SELECT * FROM `playlistData` WHERE `roomId`='$playlistId' ORDER BY `playlistId`") or die ($m->error);
+	if($s->num_rows>=1){
+		$userId = $app->request->post('userId');
+		$level = $app->request->post('level');		
+		$app->response->setStatus(201);
+	$m->query("INSERT INTO `playlistPerms` (`userId`,`level`,`playlistId`) VALUES ('$userId','$level','$playlistId')")or die($m->error);
+	}
+	else {
+		$app->response->setStatus(400);
+		echo json_encode(array("code" => 400, "message" => "The specified playlist does not exist", "description" => "Unable to locate requested resource.")); 
+	}	
 });
 
 $app->post('/logout', function() use($app) {
