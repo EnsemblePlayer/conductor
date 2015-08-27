@@ -306,7 +306,7 @@ $app->post('/playlists/:id', function ($id) use ($app, $config, $m) { //copies p
 			$l = $arr['level'];
 			$m->query("INSERT INTO `playlistPerms` (`userId`,`level`,`playlistId`) VALUES ('$u','$l','$playlistId')") or die($m->error); //copy permissions from target to new
 		}
-		$m->query("DELETE FROM `playlistPerms` WHERE `playlistId`='playlistId'AND`userId`='$userId'") or die($m->error); //remove old owner permissions
+		$m->query("DELETE FROM `playlistPerms` WHERE `playlistId`='$playlistId'AND`userId`='$userId'") or die($m->error); //remove old owner permissions
 		$m->query("INSERT INTO `playlistPerms` (`level`,`playlistId`,`userId`) VALUES ('4','$playlistId','$userId')") or die($m->error); //insert owner permission
 		$s = $m->query("SELECT * FROM `playlistSongs` WHERE `playlistId`='$id' ORDER BY `userId`") or die($m->error);
 		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
