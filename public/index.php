@@ -407,8 +407,8 @@ $app->post('/rooms/:room/permissions', function ($roomId) use ($app, $config, $m
 	}
 });
 
-$app->post('/playlists/:playlist/permissions', function ($playlistId) use ($app, $config, $m) {
-	$s = $m->query("SELECT * FROM `playlistData` WHERE `playlistId`='$playlistId' ORDER BY `playlistId`") or die ($m->error);
+$app->post('/playlists/:playlist/permissions', function ($playlistId) use ($app, $config, $m) { //add permissions to playlists :id
+	$s = $m->query("SELECT * FROM `playlistData` WHERE `playlistId`='$playlistId' ORDER BY `playlistId`") or die ($m->error); //check if playlist exists
 	if($s->num_rows>=1){
 		$userId = $app->request->post('userId');
 		$level = $app->request->post('level');	
@@ -430,17 +430,37 @@ $app->post('/playlists/:playlist/permissions', function ($playlistId) use ($app,
 	}	
 });
 
-$app->delete('/rooms/:id', function ($roomId) use ($app, $config, $m) {
+$app->delete('/rooms/:id', function ($roomId) use ($app, $config, $m) { //delete room with :id and all associated (Perms, Songs, Data) (NOT HISTORY)
     $m->query("DELETE FROM `roomData` WHERE `roomId`='$roomId'")or die($m->error);
 	$m->query("DELETE FROM `roomPerms` WHERE `roomId`='$roomId'")or die($m->error);
 	$m->query("DELETE FROM `roomSongs` WHERE `roomId`='$roomId'")or die($m->error);
 	$app->response->setStatus(200);
 });
 
-$app->delete('/playlists/:id', function ($playlistId) use ($app, $config, $m) {
+$app->delete('/playlists/:id', function ($playlistId) use ($app, $config, $m) { //delete playlist with :id and all associated (Perms, Songs, Data)
     $m->query("DELETE FROM `playlistData` WHERE `playlistId`='$playlistId'")or die($m->error);
 	$m->query("DELETE FROM `playlistPerms` WHERE `playlistId`='$playlistId'")or die($m->error);
 	$m->query("DELETE FROM `playlistSongs` WHERE `playlistId`='$playlistId'")or die($m->error);
+	$app->response->setStatus(200);
+});
+
+$app->delete('/rooms/:room/songs', function ($roomId) use ($app, $config, $m) { //delete all songs in room with :room
+	$m->query("DELETE FROM `roomSongs` WHERE `roomId`='$roomId'")or die($m->error);
+	$app->response->setStatus(200);
+});
+
+$app->delete('/rooms/:room/songs/:id', function ($roomId,$id) use ($app, $config, $m) { //delete all songs with :id in room with :room
+	$m->query("DELETE FROM `roomSongs` WHERE `roomId`='$roomId'AND`songId`='$id'")or die($m->error);
+	$app->response->setStatus(200);
+});
+
+$app->delete('/playlists/:playlist/songs', function ($playlistId) use ($app, $config, $m) { //delete all songs in playlist with :playlist
+	$m->query("DELETE FROM `playlistSongs` WHERE `playlistId`='$playlistId'")or die($m->error);
+	$app->response->setStatus(200);
+});
+
+$app->delete('/playlists/:playlist/songs', function ($playlistId,$id) use ($app, $config, $m) { //delete all songs with :id in playlist with :playlist
+	$m->query("DELETE FROM `playlistSongs` WHERE `playlistId`='$playlistId'AND`songId`='$id'")or die($m->error);
 	$app->response->setStatus(200);
 });
 
