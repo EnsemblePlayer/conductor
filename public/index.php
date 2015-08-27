@@ -133,7 +133,7 @@ $app->get('/rooms/:room/songs', function($room) use($app, $config, $m) { //retur
 
 $app->get('/rooms/:room/songs/:id', function($room,$id) use($app, $config, $m) { //return all songs in room with :id
 	$app->response->setStatus(200);
-	$s = $m->query("SELECT * FROM `roomSongs` WHERE `roomId`='$room'AND`songID`='$id' ORDER BY `position`") or die($m->error);
+	$s = $m->query("SELECT * FROM `roomSongs` WHERE `roomId`='$room'AND`songId`='$id' ORDER BY `position`") or die($m->error);
 	if($s->num_rows>=1){
 		$songs = array();
 		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
@@ -163,7 +163,7 @@ $app->get('/playlists/:playlist/songs', function($pl) use($app, $config, $m) { /
 
 $app->get('/playlists/:playlist/songs/:id', function($pl,$id) use($app, $config, $m) { //return all songs in playlist with :id
 	$app->response->setStatus(200);
-	$s = $m->query("SELECT * FROM `playlistSongs` WHERE `playlistId`='$pl'AND`songID`='$id' ORDER BY `position`") or die($m->error);
+	$s = $m->query("SELECT * FROM `playlistSongs` WHERE `playlistId`='$pl'AND`songId`='$id' ORDER BY `position`") or die($m->error);
 	if($s->num_rows>=1){
 		$songs = array();
 		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
@@ -306,7 +306,7 @@ $app->post('/playlists/:id', function ($id) use ($app, $config, $m) { //copies p
 			$l = $arr['level'];
 			$m->query("INSERT INTO `playlistPerms` (`userId`,`level`,`playlistId`) VALUES ('$u','$l','$playlistId')") or die($m->error); //copy permissions from target to new
 		}
-		$m->query("DELETE FROM `playlistPerms` WHERE `playlistId`='playlistId'AND`userId`='$userID'") or die($m->error); //remove old owner permissions
+		$m->query("DELETE FROM `playlistPerms` WHERE `playlistId`='playlistId'AND`userId`='$userId'") or die($m->error); //remove old owner permissions
 		$m->query("INSERT INTO `playlistPerms` (`level`,`playlistId`,`userId`) VALUES ('4','$playlistId','$userId')") or die($m->error); //insert owner permission
 		$s = $m->query("SELECT * FROM `playlistSongs` WHERE `playlistId`='$id' ORDER BY `userId`") or die($m->error);
 		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
