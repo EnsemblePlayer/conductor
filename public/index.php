@@ -260,14 +260,14 @@ $app->post('/rooms/:id', function ($id) use ($app, $config, $m) { //copies room 
 	if($s->num_rows>=1){		
 		$m->query("INSERT INTO `roomData` (`name`,`password`,`userId`) VALUES ('$name','$password','$userId')") or die($m->error); //create new roomData
 		$roomId = $m->insert_id; //grab new roomId
-		$m->query("INSERT INTO `roomPerms` (`level`,`roomId`,`userId`) VALUES ('4','$roomId','$userId')") or die($m->error); //insert owner permission
 		$app->response->setStatus(201);
 		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
 			$u = $arr['userId'];
 			$l = $arr['level'];
 			$m->query("INSERT INTO `roomPerms` (`userId`,`level`,`roomId`) VALUES ('$u','$l','$roomId')") or die($m->error); //copy permissions from target to new
 		}
-		
+		$m->query("DELETE FROM `roomPerms` WHERE `roomId`='$roomId'AND`userId`='$userId'") or die ($m->error); //remove owner old permissions
+		$m->query("INSERT INTO `roomPerms` (`level`,`roomId`,`userId`) VALUES ('4','$roomId','$userId')") or die($m->error); //insert owner permission
 		$s = $m->query("SELECT * FROM `roomSongs` WHERE `roomId`='$id' ORDER BY `userId`") or die($m->error); //copy songs from target to new
 		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
 			$u = $arr['userId'];
@@ -301,12 +301,13 @@ $app->post('/playlists/:id', function ($id) use ($app, $config, $m) { //copies p
 	if($s->num_rows>=1){
 		$m->query("INSERT INTO `playlistData` (`name`,`userId`) VALUES ('$name','$userId')") or die($m->error); //create new playlistData
 		$playlistId = $m->insert_id; //grab new playlistId
-		$m->query("INSERT INTO `playlistPerms` (`level`,`playlistId`,`userId`) VALUES ('4','$playlistId','$userId')") or die($m->error); //insert owner permission
 		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
 			$u = $arr['userId'];
 			$l = $arr['level'];
 			$m->query("INSERT INTO `playlistPerms` (`userId`,`level`,`playlistId`) VALUES ('$u','$l','$playlistId')") or die($m->error); //copy permissions from target to new
 		}
+		$m->query("DELETE FROM `playlistPerms` WHERE `playlistId`='playlistId'AND`userId`='$userID'") or die($m->error); //remove old owner permissions
+		$m->query("INSERT INTO `playlistPerms` (`level`,`playlistId`,`userId`) VALUES ('4','$playlistId','$userId')") or die($m->error); //insert owner permission
 		$s = $m->query("SELECT * FROM `playlistSongs` WHERE `playlistId`='$id' ORDER BY `userId`") or die($m->error);
 		while($arr = $s->fetch_array(MYSQLI_ASSOC)){
 			$u = $arr['userId'];
@@ -407,7 +408,7 @@ $app->post('/rooms/:room/permissions', function ($roomId) use ($app, $config, $m
 		$s = $m->query("SELECT * FROM `roomPerms` WHERE `roomId`='$roomId'AND`userId`='$userId' ORDER BY `level` LIMIT 1") or die ($m->error); //grab highest current permissions
 		$arr = $s->fetch_array(MYSQLI_ASSOC);
 		if($level > $arr['level']){
-			$s = $m->query("DELETE FROM `roomPerms` WHERE `roomId`='$roomId'AND`userId`='$userId'") or die ($m->error); //delete all entries for room with user
+			$m->query("DELETE FROM `roomPerms` WHERE `roomId`='$roomId'AND`userId`='$userId'") or die ($m->error); //delete all entries for room with user
 			$app->response->setStatus(201);
 			$m->query("INSERT INTO `roomPerms` (`userId`,`level`,`roomId`) VALUES ('$userId','$level','$roomId')")or die($m->error); //add permission with new level
 		}
@@ -431,7 +432,7 @@ $app->post('/playlists/:playlist/permissions', function ($playlistId) use ($app,
 		$s = $m->query("SELECT * FROM `playlistPerms` WHERE `playlistId`='$playlistId'AND`userId`='$userId' ORDER BY `level` LIMIT 1") or die ($m->error); //grab highest current permissions
 		$arr = $s->fetch_array(MYSQLI_ASSOC);
 		if($level > $arr['level']){
-			$s = $m->query("DELETE FROM `playlistPerms` WHERE `playlistId`='$playlistId'AND`userId`='$userId'") or die ($m->error); //delete all entries for room with user	
+			$m->query("DELETE FROM `playlistPerms` WHERE `playlistId`='$playlistId'AND`userId`='$userId'") or die ($m->error); //delete all entries for room with user	
 			$app->response->setStatus(201);
 			$m->query("INSERT INTO `playlistPerms` (`userId`,`level`,`playlistId`) VALUES ('$userId','$level','$playlistId')")or die($m->error);
 		}
