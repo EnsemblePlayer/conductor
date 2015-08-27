@@ -5,10 +5,9 @@ require_once '../app/middleware/APIResponseMiddleware.php';
 $config = require_once '../app/config.php';
 $app = new \Slim\Slim($config['slim']);
 $app->add(new \middleware\APIResponseMiddleware($config));
-$m = mysqli_connect("localhost","root","teotauy18","secondEnsemble");
-//$m->query("") or die($m->error);
+$m = mysqli_connect("localhost","root","teotauy18","secondEnsemble");	//establish connection to database
 if (!$m) {
-    echo json_encode(array("code" => 500, "message" => "Could not connect", "description" => "Unable to locate requested resource."));
+    echo json_encode(array("code" => 500, "message" => "Could not connect", "description" => "Unable to locate requested resource.")); //could not connect to database
 }
 
 $app->get('/', function() use($app, $config) {
@@ -16,13 +15,11 @@ $app->get('/', function() use($app, $config) {
     echo json_encode(array("name" => "conductor", "version" => $config['conductor']['version']));
 });
 
-$app->get('/users', function() use($app, $config, $m) {
+$app->get('/users', function() use($app, $config, $m) { //return all users
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `userData` ORDER BY `userId`") or die($m->error);
 	$users = array();
 	while($arr = $s->fetch_array(MYSQLI_ASSOC)){
-	//	unset($arr['password']);
-	//	$users[] = $arr;
 		$u = array();
 		$u['userId'] = $arr['userId'];
 		$u['username']= $arr['username'];
@@ -31,7 +28,7 @@ $app->get('/users', function() use($app, $config, $m) {
 	echo json_encode($users);
 });	
 
-$app->get('/users/:id', function($id) use($app, $config, $m) {
+$app->get('/users/:id', function($id) use($app, $config, $m) { //return user with :id
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `userData` WHERE `userId`='$id' ORDER BY `userId`") or die($m->error);
 	if($s->num_rows==1){
@@ -45,7 +42,7 @@ $app->get('/users/:id', function($id) use($app, $config, $m) {
 	}
 });
 
-$app->get('/rooms', function() use($app, $config, $m) {
+$app->get('/rooms', function() use($app, $config, $m) { //return all rooms
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `roomData` ORDER BY `roomId`") or die($m->error);
 	$rooms = array();
@@ -56,7 +53,7 @@ $app->get('/rooms', function() use($app, $config, $m) {
 	echo json_encode($rooms);
 });
 
-$app->get('/rooms/:id', function($id) use($app, $config, $m) {
+$app->get('/rooms/:id', function($id) use($app, $config, $m) { //return room with :id
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `roomData` WHERE `roomId`='$id' ORDER BY `roomId`") or die($m->error);
 	if($s->num_rows==1){
@@ -68,7 +65,7 @@ $app->get('/rooms/:id', function($id) use($app, $config, $m) {
 	}
 });
 
-$app->get('/users/:user/rooms', function($user) use($app, $config, $m) {
+$app->get('/users/:user/rooms', function($user) use($app, $config, $m) { //return rooms user has access to
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `roomPerms` WHERE `userId`='$user' ORDER BY `roomId`") or die($m->error);
 	if($s->num_rows>=1){
@@ -83,7 +80,7 @@ $app->get('/users/:user/rooms', function($user) use($app, $config, $m) {
 	}
 });
 
-$app->get('/playlists', function() use($app, $config, $m) {
+$app->get('/playlists', function() use($app, $config, $m) { //return all playlists
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `playlistData` ORDER BY `playlistId`") or die($m->error);
 	$pls = array();
@@ -93,7 +90,7 @@ $app->get('/playlists', function() use($app, $config, $m) {
 	echo json_encode($pls);
 });
 
-$app->get('/playlists/:id', function($id) use($app, $config, $m) {
+$app->get('/playlists/:id', function($id) use($app, $config, $m) { //return playlist with :id
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `playlistData` WHERE `playlistId`='$id' ORDER BY `playlistId`") or die($m->error);
 	if($s->num_rows==1){
@@ -104,7 +101,7 @@ $app->get('/playlists/:id', function($id) use($app, $config, $m) {
 	}
 });
 
-$app->get('/users/:user/playlists', function($user) use($app, $config, $m) {
+$app->get('/users/:user/playlists', function($user) use($app, $config, $m) { //return all playlists user has access to
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `playlistPerms` WHERE `userId`='$user' ORDER BY `playlistId`") or die($m->error);
 	if($s->num_rows>=1){
@@ -119,7 +116,7 @@ $app->get('/users/:user/playlists', function($user) use($app, $config, $m) {
 	}
 });
 
-$app->get('/rooms/:room/songs', function($room) use($app, $config, $m) {
+$app->get('/rooms/:room/songs', function($room) use($app, $config, $m) { //return all songs in room
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `roomSongs` WHERE `roomId`='$room' ORDER BY `position`") or die($m->error);
 	if($s->num_rows>=1){
@@ -134,7 +131,7 @@ $app->get('/rooms/:room/songs', function($room) use($app, $config, $m) {
 	}
 });
 
-$app->get('/rooms/:room/songs/:id', function($room,$id) use($app, $config, $m) {
+$app->get('/rooms/:room/songs/:id', function($room,$id) use($app, $config, $m) { //return all songs in room with :id
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `roomSongs` WHERE `roomId`='$room'AND`songID`='$id' ORDER BY `position`") or die($m->error);
 	if($s->num_rows>=1){
@@ -149,7 +146,7 @@ $app->get('/rooms/:room/songs/:id', function($room,$id) use($app, $config, $m) {
 	}
 });
 
-$app->get('/playlists/:playlist/songs', function($pl) use($app, $config, $m) {
+$app->get('/playlists/:playlist/songs', function($pl) use($app, $config, $m) { //return all songs in playlist
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `playlistSongs` WHERE `playlistId`='$pl' ORDER BY `position`") or die($m->error);
 	if($s->num_rows>=1){
@@ -164,7 +161,7 @@ $app->get('/playlists/:playlist/songs', function($pl) use($app, $config, $m) {
 	}
 });
 
-$app->get('/playlists/:playlist/songs/:id', function($pl,$id) use($app, $config, $m) {
+$app->get('/playlists/:playlist/songs/:id', function($pl,$id) use($app, $config, $m) { //return all songs in playlist with :id
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `playlistSongs` WHERE `playlistId`='$pl'AND`songID`='$id' ORDER BY `position`") or die($m->error);
 	if($s->num_rows>=1){
@@ -179,7 +176,7 @@ $app->get('/playlists/:playlist/songs/:id', function($pl,$id) use($app, $config,
 	}
 });
 
-$app->get('/rooms/:room/permissions', function($room) use($app, $config, $m) {
+$app->get('/rooms/:room/permissions', function($room) use($app, $config, $m) { //return all permissions for room with :room
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `roomPerms` WHERE `roomId`='$room' ORDER BY `userId`") or die($m->error);
 	if($s->num_rows>=1){
@@ -194,7 +191,7 @@ $app->get('/rooms/:room/permissions', function($room) use($app, $config, $m) {
 	}
 });
 
-$app->get('/rooms/:room/permissions/:user', function($room,$user) use($app, $config, $m) {
+$app->get('/rooms/:room/permissions/:user', function($room,$user) use($app, $config, $m) { //return all permissions for room with :room and user with :id
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `roomPerms` WHERE `roomId`='$room'AND`userId`='$user' ORDER BY `userId`") or die($m->error);
 	if($s->num_rows>=1){
@@ -209,7 +206,7 @@ $app->get('/rooms/:room/permissions/:user', function($room,$user) use($app, $con
 	}
 });
 
-$app->get('/playlists/:playlist/permissions', function($pl) use($app, $config, $m) {
+$app->get('/playlists/:playlist/permissions', function($pl) use($app, $config, $m) { //return all permissions for playlist with :pl
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `playlistPerms` WHERE `playlistId`='$pl' ORDER BY `userId`") or die($m->error);
 	if($s->num_rows>=1){
@@ -224,7 +221,7 @@ $app->get('/playlists/:playlist/permissions', function($pl) use($app, $config, $
 	}
 });
 
-$app->get('/playlists/:playlist/permissions/:user', function($pl,$user) use($appa, $config, $m) {
+$app->get('/playlists/:playlist/permissions/:user', function($pl,$user) use($appa, $config, $m) { //return all permissions for playlist with :pl and user with :id
 	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `playlistPerms` WHERE `playlistId`='$pl'AND`userId`='$user' ORDER BY `userId`") or die($m->error);
 	if($s->num_rows>=1){
@@ -411,6 +408,13 @@ $app->post('/playlists/:playlist/permissions', function ($playlistId) use ($app,
 		$app->response->setStatus(400);
 		echo json_encode(array("code" => 400, "message" => "The specified playlist does not exist", "description" => "Unable to locate requested resource.")); 
 	}	
+});
+
+$app->delete('/rooms/:id', function ($roomId) use ($app, $config, $m) {
+    $m->query("DELETE FROM `roomData` WHERE `roomId`='$roomId'")or die($m->error);
+	$m->query("DELETE FROM `roomPerms` WHERE `roomId`='$roomId'")or die($m->error);
+	$m->query("DELETE FROM `roomSongs` WHERE `roomId`='$roomId'")or die($m->error);
+	$app->response->setStatus(200);
 });
 
 $app->post('/logout', function() use($app) {
