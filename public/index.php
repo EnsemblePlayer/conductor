@@ -388,7 +388,7 @@ $app->post('/rooms/:room/permissions', function ($roomId) use ($app, $config, $m
 		$userId = $app->request->post('userId');
 		$level = $app->request->post('level');
 		$s = $m->query("SELECT * FROM `roomPerms` WHERE `roomId`='$roomId'AND`userId`='$userId' ORDER BY `level` LIMIT 1") or die ($m->error); //grab highest current permissions
-		$arr = $s->fetch_array(MYSQLI_ASSOC)
+		$arr = $s->fetch_array(MYSQLI_ASSOC);
 		if($level > $arr['level']){
 			$s = $m->query("DELETE FROM `roomPerms` WHERE `roomId`='$roomId'AND`userId`='$userId'") or die ($m->error); //delete all entries for room with user
 			$app->response->setStatus(201);
