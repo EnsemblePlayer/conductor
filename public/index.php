@@ -387,6 +387,7 @@ $app->post('/rooms/:room/permissions', function ($roomId) use ($app, $config, $m
 	if($s->num_rows>=1){
 		$userId = $app->request->post('userId');
 		$level = $app->request->post('level');
+		
 		$s = $m->query("SELECT * FROM `roomPerms` WHERE `roomId`='$roomId'AND`userId`='$userId' ORDER BY `level` LIMIT 1") or die ($m->error); //grab highest current permissions
 		$arr = $s->fetch_array(MYSQLI_ASSOC);
 		if($level > $arr['level']){
@@ -394,20 +395,33 @@ $app->post('/rooms/:room/permissions', function ($roomId) use ($app, $config, $m
 			$app->response->setStatus(201);
 			$m->query("INSERT INTO `roomPerms` (`userId`,`level`,`roomId`) VALUES ('$userId','$level','$roomId')")or die($m->error); //add permission with new level
 		}
+		else{
+			$app->response->setStatus(400);
+			echo json_encode(array("code" => 400, "message" => "The user already has same or higher permissions", "description" => "Unable to locate requested resource.")); 
+		}
 	}
 	else {
 		$app->response->setStatus(400);
 		echo json_encode(array("code" => 400, "message" => "The specified room does not exist", "description" => "Unable to locate requested resource.")); 
-	}	
+	}
 });
 
 $app->post('/playlists/:playlist/permissions', function ($playlistId) use ($app, $config, $m) {
 	$s = $m->query("SELECT * FROM `playlistData` WHERE `playlistId`='$playlistId' ORDER BY `playlistId`") or die ($m->error);
 	if($s->num_rows>=1){
 		$userId = $app->request->post('userId');
-		$level = $app->request->post('level');		
-		$app->response->setStatus(201);
-	$m->query("INSERT INTO `playlistPerms` (`userId`,`level`,`playlistId`) VALUES ('$userId','$level','$playlistId')")or die($m->error);
+		$level = $app->request->post('level');	
+		$s = $m->query("SELECT * FROM `playlistPerms` WHERE `playlistId`='$playlistId'AND`userId`='$userId' ORDER BY `level` LIMIT 1") or die ($m->error); //grab highest current permissions
+		$arr = $s->fetch_array(MYSQLI_ASSOC);
+		if($level > $arr['level']){
+			$s = $m->query("DELETE FROM `playlistPerms` WHERE `playlistId`='$playlistId'AND`userId`='$userId'") or die ($m->error); //delete all entries for room with user	
+			$app->response->setStatus(201);
+			$m->query("INSERT INTO `playlistPerms` (`userId`,`level`,`playlistId`) VALUES ('$userId','$level','$playlistId')")or die($m->error);
+		}
+		else{
+			$app->response->setStatus(400);
+			echo json_encode(array("code" => 400, "message" => "The user already has same or higher permissions", "description" => "Unable to locate requested resource.")); 
+		}
 	}
 	else {
 		$app->response->setStatus(400);
