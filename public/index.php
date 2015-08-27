@@ -459,7 +459,7 @@ $app->delete('/playlists/:playlist/songs', function ($playlistId) use ($app, $co
 	$app->response->setStatus(200);
 });
 
-$app->delete('/playlists/:playlist/songs', function ($playlistId,$id) use ($app, $config, $m) { //delete all songs with :id in playlist with :playlist
+$app->delete('/playlists/:playlist/songs/:id', function ($playlistId,$id) use ($app, $config, $m) { //delete all songs with :id in playlist with :playlist
 	$m->query("DELETE FROM `playlistSongs` WHERE `playlistId`='$playlistId'AND`songId`='$id'")or die($m->error);
 	$app->response->setStatus(200);
 });
