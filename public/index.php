@@ -222,6 +222,7 @@ $app->get('/playlists/:playlist/permissions', function($pl) use($app, $config, $
 });
 
 $app->get('/playlists/:playlist/permissions/:user', function($pl,$user) use($appa, $config, $m) { //return all permissions for playlist with :pl and user with :id
+	$app->response->setStatus(200);
 	$s = $m->query("SELECT * FROM `playlistPerms` WHERE `playlistId`='$pl'AND`userId`='$user' ORDER BY `userId`") or die($m->error);
 	if($s->num_rows>=1){
 		$u = array();
