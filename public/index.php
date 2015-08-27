@@ -314,6 +314,7 @@ $app->post('/playlists/:id', function ($id) use ($app, $config, $m) { //copies p
 	}
 });
 
+//TODO CONFIRM USER EXISTS; CONFIRM SONG EXISTS
 $app->post('/rooms/:room/songs', function ($roomId) use ($app, $config, $m) { //adds song to room
     $s = $m->query("SELECT * FROM `roomData` WHERE `roomId`='$roomId' ORDER BY `roomId`") or die ($m->error);
 	if($s->num_rows>=1){
@@ -433,6 +434,13 @@ $app->delete('/rooms/:id', function ($roomId) use ($app, $config, $m) {
     $m->query("DELETE FROM `roomData` WHERE `roomId`='$roomId'")or die($m->error);
 	$m->query("DELETE FROM `roomPerms` WHERE `roomId`='$roomId'")or die($m->error);
 	$m->query("DELETE FROM `roomSongs` WHERE `roomId`='$roomId'")or die($m->error);
+	$app->response->setStatus(200);
+});
+
+$app->delete('/playlists/:id', function ($playlistId) use ($app, $config, $m) {
+    $m->query("DELETE FROM `playlistData` WHERE `playlistId`='$playlistId'")or die($m->error);
+	$m->query("DELETE FROM `playlistPerms` WHERE `playlistId`='$playlistId'")or die($m->error);
+	$m->query("DELETE FROM `playlistSongs` WHERE `playlistId`='$playlistId'")or die($m->error);
 	$app->response->setStatus(200);
 });
 
