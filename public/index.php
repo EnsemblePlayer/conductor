@@ -236,7 +236,7 @@ $app->get('/playlists/:playlist/permissions/:user', function($pl,$user) use($app
 	}
 });
 
-$app->post('/rooms', function () use ($app, $config, $m) {
+$app->post('/rooms', function () use ($app, $config, $m) { //creates new room
     $name = $app->request->post('name');
 	$password = $app->request->post('password');
 	$userId = $app->request->post('userId');
@@ -246,7 +246,7 @@ $app->post('/rooms', function () use ($app, $config, $m) {
 	$app->response->setStatus(201);
 });
 
-$app->post('/rooms/:id', function ($id) use ($app, $config, $m) {
+$app->post('/rooms/:id', function ($id) use ($app, $config, $m) { //copies room with :id to new room (songs, perms, data)
     $name = $app->request->post('name');
 	$password = $app->request->post('password');
 	$userId = $app->request->post('userId');
@@ -276,7 +276,7 @@ $app->post('/rooms/:id', function ($id) use ($app, $config, $m) {
 	}	
 });
 
-$app->post('/playlists', function () use ($app, $config, $m) {
+$app->post('/playlists', function () use ($app, $config, $m) { //creates new playlist
     $name = $app->request->post('name');
 	$userId = $app->request->post('userId');
     $m->query("INSERT INTO `playlistData` (`name`,`userId`) VALUES ('$name','$userId')")or die($m->error);
@@ -285,7 +285,7 @@ $app->post('/playlists', function () use ($app, $config, $m) {
 	$app->response->setStatus(201);
 });
 
-$app->post('/playlists/:id', function ($id) use ($app, $config, $m) {
+$app->post('/playlists/:id', function ($id) use ($app, $config, $m) { //copies playlist with :id to new playlist (songs, perms, data)
     $name = $app->request->post('name');
 	$userId = $app->request->post('userId');
 	$playlistId = $m->insert_id;
@@ -314,7 +314,7 @@ $app->post('/playlists/:id', function ($id) use ($app, $config, $m) {
 	}
 });
 
-$app->post('/rooms/:room/songs', function ($roomId) use ($app, $config, $m) {
+$app->post('/rooms/:room/songs', function ($roomId) use ($app, $config, $m) { //adds song to room
     $s = $m->query("SELECT * FROM `roomData` WHERE `roomId`='$roomId' ORDER BY `roomId`") or die ($m->error);
 	if($s->num_rows>=1){
 		$priority = $app->request->post('priority');
@@ -330,8 +330,8 @@ $app->post('/rooms/:room/songs', function ($roomId) use ($app, $config, $m) {
 		echo json_encode(array("code" => 400, "message" => "The specified room does not exist", "description" => "Unable to locate requested resource.")); 
 	}
 });
-
-$app->post('/rooms/:room/songs/:id', function ($roomId,$sid) use ($app, $config, $m) {
+//this method probably has no viablue use currently - may need to rethink how this path should be and the contents of this method
+$app->post('/rooms/:room/songs/:id', function ($roomId,$sid) use ($app, $config, $m) { //copies song with :id from room :room back to room :room
 	$s = $m->query("SELECT * FROM `roomSongs` WHERE `songId`='$sid'AND`roomId`='$roomId' ORDER BY `position` LIMIT 1") or die($m->error);
 	if($s->num_rows>=1){
 		$arr = $s->fetch_array(MYSQLI_ASSOC);
@@ -348,7 +348,7 @@ $app->post('/rooms/:room/songs/:id', function ($roomId,$sid) use ($app, $config,
 	}
 });
 
-$app->post('/playlists/:playlist/songs', function ($playlistId) use ($app, $config, $m) {
+$app->post('/playlists/:playlist/songs', function ($playlistId) use ($app, $config, $m) { //adds song to playlist
     $s = $m->query("SELECT * FROM `playlistData` WHERE `playlistId`='$playlistId' ORDER BY `playlistId`") or die ($m->error);
 	if($s->num_rows>=1){
 		$priority = $app->request->post('priority');
@@ -364,8 +364,8 @@ $app->post('/playlists/:playlist/songs', function ($playlistId) use ($app, $conf
 		echo json_encode(array("code" => 400, "message" => "The specified playlist does not exist", "description" => "Unable to locate requested resource.")); 
 	}
 });
-
-$app->post('/playlists/:playlist/songs/:id', function ($playlistId,$sid) use ($app, $config, $m) {
+//see comment on rooms/:room/songs/:id for thoughts on the viability of this method
+$app->post('/playlists/:playlist/songs/:id', function ($playlistId,$sid) use ($app, $config, $m) { //copies song with :id from playlist :pl back to playlist :pl
 	$s = $m->query("SELECT * FROM `playlistSongs` WHERE `songId`='$sid'AND`playlistId`='$playlistId' ORDER BY `position` LIMIT 1") or die($m->error);
 	if($s->num_rows>=1){
 		$arr = $s->fetch_array(MYSQLI_ASSOC);
@@ -382,13 +382,18 @@ $app->post('/playlists/:playlist/songs/:id', function ($playlistId,$sid) use ($a
 	}
 });
 
-$app->post('/rooms/:room/permissions', function ($roomId) use ($app, $config, $m) {
-	$s = $m->query("SELECT * FROM `roomData` WHERE `roomId`='$roomId' ORDER BY `roomId`") or die ($m->error);
+$app->post('/rooms/:room/permissions', function ($roomId) use ($app, $config, $m) { //add permissions to room :id
+	$s = $m->query("SELECT * FROM `roomData` WHERE `roomId`='$roomId' ORDER BY `roomId`") or die ($m->error); //check if room exists
 	if($s->num_rows>=1){
 		$userId = $app->request->post('userId');
-		$level = $app->request->post('level');		
-		$app->response->setStatus(201);
-	$m->query("INSERT INTO `roomPerms` (`userId`,`level`,`roomId`) VALUES ('$userId','$level','$roomId')")or die($m->error);
+		$level = $app->request->post('level');
+		$s = $m->query("SELECT * FROM `roomPerms` WHERE `roomId`='$roomId'AND`userId`='$userId' ORDER BY `level` LIMIT 1") or die ($m->error); //grab highest current permissions
+		$arr = $s->fetch_array(MYSQLI_ASSOC))
+		if($level > $arr['level']){
+			$s = $m->query("DELETE FROM `roomPerms` WHERE `roomId`='$roomId'AND`userId`='$userId'") or die ($m->error); //delete all entries for room with user
+			$app->response->setStatus(201);
+			$m->query("INSERT INTO `roomPerms` (`userId`,`level`,`roomId`) VALUES ('$userId','$level','$roomId')")or die($m->error); //add permission with new level
+		}
 	}
 	else {
 		$app->response->setStatus(400);
