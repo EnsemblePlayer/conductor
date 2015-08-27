@@ -230,10 +230,8 @@ $app->get('/playlists/:playlist/permissions/:user', function($pl,$user) use($app
 			$u[] = $arr;
 		}
 		echo json_encode($u);
-		$app->response->setStatus(200);
 	} else {
 		echo json_encode(array("code" => 204, "message" => "That playlist has no permissions for the specified user", "description" => "Unable to locate requested resource.")); 
-		$app->response->setStatus(400);
 	}
 });
 
