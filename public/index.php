@@ -515,8 +515,8 @@ $app->delete('/playlists/:playlist/permissions/:user', function ($playlistId,$us
 *****************************************************************************************************************************************************************************************/
 
 $app->put('/rooms/:id', function ($roomId) use ($app, $config, $m) { //update room data
-	$roomName = $app->request->post('roomName');
-	$password = $app->request->post('password');
+	$roomName = $app->request->put('roomName');
+	$password = $app->request->put('password');
 	$m->query("UPDATE `roomData` SET `name`='$roomName' WHERE `roomId`='$roomId'")or die($m->error);
 	$m->query("UPDATE `roomData` SET `password`='$password' WHERE `roomId`='$roomId'")or die($m->error);
 	$app->response->setStatus(200);
