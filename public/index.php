@@ -519,7 +519,6 @@ $app->put('/rooms/:id', function ($roomId) use ($app, $config, $m) { //update ro
 	$password = $app->request->put('password');
 	echo $app->request->body();
 	echo $app->request->put();
-	echo $app->request->post();
 	$m->query("UPDATE `roomData` SET `name`='$roomName' WHERE `roomId`='$roomId'")or die($m->error);
 	$m->query("UPDATE `roomData` SET `password`='$password' WHERE `roomId`='$roomId'")or die($m->error);
 	$app->response->setStatus(200);
