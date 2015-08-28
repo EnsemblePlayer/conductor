@@ -8,11 +8,22 @@ $app->add(new \middleware\APIResponseMiddleware($config));
 $m = mysqli_connect("localhost","root","teotauy18","secondEnsemble");	//establish connection to database
 if (!$m) {
     echo json_encode(array("code" => 500, "message" => "Could not connect", "description" => "Unable to locate requested resource.")); //could not connect to database
+    die;
 }
 
 $app->get('/', function() use($app, $config) {
     $app->response->setStatus(200);
-    echo json_encode(array("name" => "conductor", "version" => $config['conductor']['version']));
+    echo json_encode(array(
+    	"name" => "conductor", 
+    	"version" => $config['conductor']['version'],
+    	"endpoints" => array(
+    			"users" => "/users",
+    			"rooms" => "/rooms",
+    			"playlists" => "/playlists",
+    			"permissions" => "/permissions"
+    		)
+    	)
+    );
 });
 
 /*****************************************************************************************************************************************************************************************
