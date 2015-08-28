@@ -511,6 +511,20 @@ $app->delete('/playlists/:playlist/permissions/:user', function ($playlistId,$us
 	$app->response->setStatus(200);
 });
 
+/*****************************************************************************************************************************************************************************************
+*****************************************************************************************************************************************************************************************/
+
+$app->put('/rooms/:id', function ($roomId) use ($app, $config, $m) { //update room data
+	$roomName = $app->request->post('roomName');
+	$password = $app->request->post('password');
+	$m->query("UPDATE `roomData` SET `name`='$roomName' WHERE `roomId`='$roomId'")or die($m->error);
+	$m->query("UPDATE `roomData` SET `password`='$password' WHERE `roomId`='$roomId'")or die($m->error);
+	$app->response->setStatus(200);
+});
+
+/*****************************************************************************************************************************************************************************************
+*****************************************************************************************************************************************************************************************/
+
 $app->post('/logout', function() use($app) {
 	// TODO: Revoke session key
     $app->response->setStatus(200);
