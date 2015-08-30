@@ -524,9 +524,7 @@ $app->put('/rooms/:id', function ($roomId) use ($app, $config, $m) { //update ro
 
 $app->put('/playlists/:id', function ($playlistId) use ($app, $config, $m) { //update playlist data
 	$playlistName = $app->request->put('name');
-	$password = $app->request->put('password');
 	$m->query("UPDATE `playlistData` SET `name`='$playlistName' WHERE `playlistId`='$playlistId'")or die($m->error);
-	$m->query("UPDATE `playlistData` SET `password`='$password' WHERE `playlistId`='$playlistId'")or die($m->error);
 	$app->response->setStatus(200);
 });
 
